@@ -8,14 +8,14 @@ import tornadofx.control.Form;
 
 import java.time.format.DateTimeFormatter;
 
-class TaskForm {
+class ShutdownForm {
 
     private final Form form = new Form();
 
-    private Countdown countdown;
-    private boolean counterAndCancelInitialized;
+    private ShutdownTimer shutdownTimer;
+    private boolean initialized;
 
-    TaskForm() {
+    ShutdownForm() {
         build();
     }
 
@@ -30,41 +30,43 @@ class TaskForm {
         fieldset.field("Date and time", shutdownDateTimePicker);
 
         Button startButton = new Button("Schedule");
-        startButton.setOnMouseClicked(start -> {
-            shutdownDateTimePicker.setDisable(true);
-            startButton.setDisable(true);
-
-            if (!counterAndCancelInitialized) {
-                initializeCounterAndCancel(fieldset, shutdownDateTimePicker, startButton);
-            }
-
-            countdown = new Countdown(shutdownDateTimePicker);
-            countdown.start();
-        });
+        startButton.setOnMouseClicked(start -> start(fieldset, shutdownDateTimePicker, startButton));
 
         fieldset.field(startButton);
     }
 
+    private void start(final Fieldset fieldset, final DateTimePicker shutdownDateTimePicker, final Button startButton) {
+        shutdownDateTimePicker.setDisable(true);
+        startButton.setDisable(true);
+
+        if (!initialized) {
+            initializeCounterAndCancel(fieldset, shutdownDateTimePicker, startButton);
+        }
+
+        shutdownTimer = new ShutdownTimer(shutdownDateTimePicker);
+        shutdownTimer.start();
+    }
+
     private void initializeCounterAndCancel(final Fieldset fieldset, final DateTimePicker shutdownDateTimePicker,
                                             final Button startButton) {
-        Label counter = new Label(formatLabel(shutdownDateTimePicker));
+        Label counter = new Label(formatScheduleLabel(shutdownDateTimePicker));
         fieldset.field("Shutdown computer", counter);
 
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(cancel -> cancel(shutdownDateTimePicker, startButton));
         fieldset.field("Abort", cancelButton);
 
-        counterAndCancelInitialized = true;
+        initialized = true;
     }
 
-    private String formatLabel(DateTimePicker shutdownDateTimePicker) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private String formatScheduleLabel(DateTimePicker shutdownDateTimePicker) {
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return shutdownDateTimePicker.getDateTimeValue().format(formatter);
     }
 
     private void cancel(DateTimePicker shutdownDateTimePicker, Button startButton) {
         shutdownDateTimePicker.setDisable(false);
         startButton.setDisable(false);
-        countdown.stop();
+        shutdownTimer.stop();
     }
 }

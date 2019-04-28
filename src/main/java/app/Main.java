@@ -11,15 +11,17 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
+        stage.setTitle(APP_TITLE);
+        stage.setScene(new Scene(createGridPane(), 300, 275));
+        stage.show();
+    }
+
+    private GridPane createGridPane() {
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
         gridPane.setVgap(10);
-        gridPane.add(new TaskForm().getForm(), 1, 1);
-        Scene scene = new Scene(gridPane, 300, 275);
-
-        stage.setTitle(APP_TITLE);
-        stage.setScene(scene);
-        stage.show();
+        gridPane.add(new ShutdownForm().getForm(), 1, 1);
+        return gridPane;
     }
 
     public static void main(String[] args) {

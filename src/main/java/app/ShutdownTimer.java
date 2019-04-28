@@ -9,15 +9,15 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class Countdown {
+class ShutdownTimer {
 
-    private static final Logger LOGGER = Logger.getLogger(Countdown.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ShutdownTimer.class.getName());
 
-    private final Timer timer = new Timer("Countdown");
+    private final Timer timer = new Timer("ShutdownTimer");
 
     private final DateTimePicker dateTimePicker;
 
-    Countdown(final DateTimePicker dateTimePicker) {
+    ShutdownTimer(final DateTimePicker dateTimePicker) {
         this.dateTimePicker = dateTimePicker;
         doCountDown();
     }

@@ -13,6 +13,8 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static app.Main.APP_WIDTH;
+
 class MainForm {
 
     private final Form m_form = new Form();
@@ -29,6 +31,8 @@ class MainForm {
     }
 
     private void build() {
+        m_form.setMinWidth(APP_WIDTH - 100);
+
         Fieldset fieldset = m_form.fieldset("Schedule automatic computer shutdown");
 
         final DateTimePicker shutdownDateTimePicker = new DateTimePicker();
@@ -39,9 +43,15 @@ class MainForm {
         mailCheckbox.setDisable(!hasMailSettings());
         fieldset.field("Send e-mail", mailCheckbox);
 
+        final CheckBox forceShutdownCheckbox = new CheckBox();
+        forceShutdownCheckbox.setDisable(!hasMailSettings());
+        fieldset.field("Force shutdown when mail cannot be sent", forceShutdownCheckbox);
+
         final Button startButton = new Button("Schedule");
         startButton.setDefaultButton(true);
-        startButton.setOnMouseClicked(start -> start(fieldset, shutdownDateTimePicker, mailCheckbox, startButton));
+        startButton.setOnMouseClicked(start -> start(
+                fieldset, shutdownDateTimePicker, mailCheckbox, forceShutdownCheckbox, startButton)
+        );
 
         final Button mailSettingsButton = new Button("Settings");
         mailSettingsButton.setOnAction(clicked -> SetupMail.display());
@@ -59,7 +69,7 @@ class MainForm {
     }
 
     private void start(final Fieldset fieldset, final DateTimePicker shutdownDateTimePicker,
-                       final CheckBox mailCheckbox, final Button startButton) {
+                       final CheckBox mailCheckbox, final CheckBox forceShutdownCheckbox, final Button startButton) {
         shutdownDateTimePicker.setDisable(true);
         mailCheckbox.setDisable(true);
         startButton.setDisable(true);
@@ -70,7 +80,8 @@ class MainForm {
 
         final LocalDateTime scheduledTime = shutdownDateTimePicker.getDateTimeValue();
         final boolean shouldSendEmail = mailCheckbox.isSelected();
-        m_countdown = new Countdown(scheduledTime, shouldSendEmail);
+        final boolean forceShuwdown = forceShutdownCheckbox.isSelected();
+        m_countdown = new Countdown(scheduledTime, shouldSendEmail, forceShuwdown);
         m_countdown.run();
     }
 

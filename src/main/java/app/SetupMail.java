@@ -19,20 +19,22 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static app.Main.APP_HEIGHT;
+import static app.Main.APP_WIDTH;
+
 class SetupMail {
     private static final Logger LOGGER = Logger.getLogger(Countdown.class.getName());
-    private static final int SCENE_WIDTH = 600;
 
     static void display() {
         Stage stage = new Stage();
         stage.initModality(Modality.WINDOW_MODAL);
-        stage.setScene(new Scene(createForm(stage), SCENE_WIDTH, 500));
+        stage.setScene(new Scene(createForm(stage), APP_WIDTH, APP_HEIGHT));
         stage.show();
     }
 
     private static GridPane createForm(final Stage stage) {
         final Form form = new Form();
-        form.setMinWidth(SCENE_WIDTH - 100);
+        form.setMinWidth(APP_WIDTH - 100);
         Fieldset fieldset = form.fieldset("Mail settings");
 
         final TextField recipient = new TextField("");
@@ -66,7 +68,7 @@ class SetupMail {
                     recipient.getCharacters().toString(),
                     sender.getCharacters().toString(),
                     smtpHostMailAddress.getCharacters().toString(),
-                    smtpHostMailPassword.getCharacters().toString(),
+                    smtpHostMailPassword.getCharacters(),
                     host.getCharacters().toString(),
                     trustedHost.getCharacters().toString(),
                     port.getCharacters().toString(),
@@ -92,7 +94,7 @@ class SetupMail {
     }
 
     private static void save(final String recipient, final String sender, final String smtpHostMailAddress,
-                             final String smtpHostMailPassword, final String host, final String trustedHost,
+                             final CharSequence smtpHostMailPassword, final String host, final String trustedHost,
                              final String port, final boolean sslEnabled) {
         try {
             Properties props = new Properties();

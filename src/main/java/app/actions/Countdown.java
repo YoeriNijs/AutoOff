@@ -16,10 +16,12 @@ public class Countdown implements IAction {
     private TimerTask m_task;
     private LocalDateTime m_scheduled;
     private boolean m_shouldSendEmail;
+    private final boolean m_forceShutdown;
 
-    public Countdown(final LocalDateTime scheduled, final boolean shouldSendEmail) {
+    public Countdown(final LocalDateTime scheduled, final boolean shouldSendEmail, final boolean forceShutdown) {
         m_scheduled = scheduled;
         m_shouldSendEmail = shouldSendEmail;
+        m_forceShutdown = forceShutdown;
     }
 
     @Override
@@ -47,7 +49,11 @@ public class Countdown implements IAction {
     private void handleTimePassed() {
         try {
             if (m_shouldSendEmail) {
-                new Mailer().run();
+                final boolean sent = new Mailer().run();
+                if (!sent && !m_forceShutdown) {
+                    LOGGER.log(Level.SEVERE, "Cannot send mail");
+                    return;
+                }
             }
 
             new Shutdown().run();

@@ -1,5 +1,6 @@
 package app.actions;
 
+import app.SetupMail;
 import app.util.AutoOffUtil;
 
 import javax.mail.Authenticator;
@@ -13,14 +14,13 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static app.SetupMail.*;
 
 class Mailer implements IAction {
 
@@ -50,13 +50,13 @@ class Mailer implements IAction {
     }
 
     private void createSession() {
-        m_properties = getProperties();
+        m_properties = SetupMail.getMailProperties(LOGGER);
         m_session = Session.getInstance(AutoOffUtil.nullChecked(m_properties), new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(
-                        AutoOffUtil.nullChecked(m_properties).getProperty("mail.smtp.host.address"),
-                        AutoOffUtil.nullChecked(m_properties).getProperty("mail.smtp.host.password")
+                        AutoOffUtil.nullChecked(m_properties).getProperty(PROPERTY_HOST_ADDRESS),
+                        AutoOffUtil.nullChecked(m_properties).getProperty(PROPERTY_HOST_PASSWORD)
                 );
             }
         });
@@ -65,9 +65,9 @@ class Mailer implements IAction {
     private void createMessage() throws MessagingException {
         final Session session = AutoOffUtil.nullChecked(m_session);
         m_message = new MimeMessage(session);
-        m_message.setFrom(new InternetAddress("computer@localhost"));
+        m_message.setFrom(new InternetAddress(PROPERTY_SENDER));
         m_message.setRecipients(Message.RecipientType.TO,
-                InternetAddress.parse(AutoOffUtil.nullChecked(m_properties).getProperty("recipient")));
+                InternetAddress.parse(AutoOffUtil.nullChecked(m_properties).getProperty(PROPERTY_RECIPIENT)));
         m_message.setSubject("Computer turned off");
 
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -80,16 +80,5 @@ class Mailer implements IAction {
         multipart.addBodyPart(mimeBodyPart);
 
         m_message.setContent(multipart);
-    }
-
-    private Properties getProperties() {
-        try (InputStream input = new FileInputStream("mail.properties")) {
-            Properties prop = new Properties();
-            prop.load(input);
-            return prop;
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Cannot retrieve properties: " + ex);
-        }
-        throw new IllegalStateException("Cannot retrieve properties");
     }
 }

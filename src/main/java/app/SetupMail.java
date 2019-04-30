@@ -12,9 +12,7 @@ import javafx.stage.Stage;
 import tornadofx.control.Fieldset;
 import tornadofx.control.Form;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,7 +20,16 @@ import java.util.logging.Logger;
 import static app.Main.APP_HEIGHT;
 import static app.Main.APP_WIDTH;
 
-class SetupMail {
+public class SetupMail {
+    public static final String PROPERTY_SENDER = "sender";
+    public static final String PROPERTY_RECIPIENT = "recipient";
+    public static final String PROPERTY_HOST_ADDRESS = "mail.smtp.host.address";
+    public static final String PROPERTY_HOST_PASSWORD = "mail.smtp.host.password";
+    private static final String PROPERTY_HOST = "mail.smtp.host";
+    private static final String PROPERTY_TRUSTED_HOST = "mail.smtp.ssl.trust";
+    private static final String PROPERTY_PORT = "mail.smtp.port";
+    private static final String PROPERTY_SSL_ENABLED = "mail.smtp.ssl.enable";
+    static final String PROPERTIES_FILE = "mail.properties";
     private static final Logger LOGGER = Logger.getLogger(Countdown.class.getName());
 
     static void display() {
@@ -32,33 +39,48 @@ class SetupMail {
         stage.show();
     }
 
+    public static Properties getMailProperties(Logger logger) {
+        try (InputStream input = new FileInputStream(PROPERTIES_FILE)) {
+            Properties prop = new Properties();
+            prop.load(input);
+            return prop;
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, "Cannot retrieve properties: " + ex);
+        }
+        throw new IllegalStateException("Cannot retrieve properties");
+    }
+
     private static GridPane createForm(final Stage stage) {
+        final Properties properties = getMailProperties(LOGGER);
+        final boolean hasMailSettings = hasMailSettings();
+
         final Form form = new Form();
         form.setMinWidth(APP_WIDTH - 100);
         Fieldset fieldset = form.fieldset("Mail settings");
 
-        final TextField recipient = new TextField("");
+        final TextField recipient = new TextField(getValue(properties, hasMailSettings, PROPERTY_RECIPIENT));
         fieldset.field("Recipient", recipient);
 
-        final TextField sender = new TextField("");
+        final TextField sender = new TextField(getValue(properties, hasMailSettings, PROPERTY_SENDER));
         fieldset.field("Sender", sender);
 
-        final TextField smtpHostMailAddress = new TextField("");
+        final TextField smtpHostMailAddress = new TextField(getValue(properties, hasMailSettings, PROPERTY_HOST_ADDRESS));
         fieldset.field("Smtp host mail address", smtpHostMailAddress);
 
-        final TextField smtpHostMailPassword = new TextField("");
+        final TextField smtpHostMailPassword = new TextField(getValue(properties, hasMailSettings, PROPERTY_HOST_PASSWORD));
         fieldset.field("Smtp host mail password", smtpHostMailPassword);
 
-        final TextField host = new TextField("");
+        final TextField host = new TextField(getValue(properties, hasMailSettings, PROPERTY_HOST));
         fieldset.field("Smtp host", host);
 
-        final TextField trustedHost = new TextField("");
+        final TextField trustedHost = new TextField(getValue(properties, hasMailSettings, PROPERTY_TRUSTED_HOST));
         fieldset.field("Smtp trusted host", trustedHost);
 
-        final TextField port = new TextField("");
+        final TextField port = new TextField(getValue(properties, hasMailSettings, PROPERTY_PORT));
         fieldset.field("Smtp port", port);
 
         final CheckBox sslEnabled = new CheckBox();
+        sslEnabled.setSelected(!"".equals(getValue(properties, hasMailSettings, PROPERTY_SSL_ENABLED)));
         fieldset.field("Ssl enabled", sslEnabled);
 
         final Button saveButton = new Button("Save");
@@ -98,19 +120,32 @@ class SetupMail {
                              final String port, final boolean sslEnabled) {
         try {
             Properties props = new Properties();
-            props.setProperty("recipient", recipient);
-            props.setProperty("sender", sender);
-            props.setProperty("mail.smtp.host.address", "" + smtpHostMailAddress);
-            props.setProperty("mail.smtp.host.password", "" + smtpHostMailPassword);
-            props.setProperty("mail.smtp.host", "" + host);
-            props.setProperty("mail.smtp.ssl.trust", "" + trustedHost);
-            props.setProperty("mail.smtp.port", "" + port);
-            props.setProperty("mail.smtp.ssl.enable", "" + sslEnabled);
-            File f = new File("mail.properties");
+            props.setProperty(PROPERTY_RECIPIENT, recipient);
+            props.setProperty(PROPERTY_SENDER, sender);
+            props.setProperty(PROPERTY_HOST_ADDRESS, "" + smtpHostMailAddress);
+            props.setProperty(PROPERTY_HOST_PASSWORD, "" + smtpHostMailPassword);
+            props.setProperty(PROPERTY_HOST, "" + host);
+            props.setProperty(PROPERTY_TRUSTED_HOST, "" + trustedHost);
+            props.setProperty(PROPERTY_PORT, "" + port);
+            props.setProperty(PROPERTY_SSL_ENABLED, "" + sslEnabled);
+            File f = new File(PROPERTIES_FILE);
             OutputStream out = new FileOutputStream(f);
             props.store(out, "AutoOff mail settings");
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Cannot store mail properties: " + e);
         }
+    }
+
+    private static boolean hasMailSettings() {
+        File f = new File(PROPERTIES_FILE);
+        return f.exists() && !f.isDirectory();
+    }
+
+    private Properties getMailProperties() {
+        return getMailProperties(LOGGER);
+    }
+
+    private static String getValue(final Properties properties, final boolean hasMailSettings, final String value) {
+        return hasMailSettings ? properties.getProperty(value) : "";
     }
 }

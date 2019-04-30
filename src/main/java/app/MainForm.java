@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static app.Main.APP_WIDTH;
+import static app.SetupMail.PROPERTIES_FILE;
 
 class MainForm {
 
@@ -40,11 +41,11 @@ class MainForm {
         fieldset.field("Date and time", shutdownDateTimePicker);
 
         final CheckBox mailCheckbox = new CheckBox();
-        mailCheckbox.setDisable(!hasMailSettings());
+        mailCheckbox.setDisable(hasNoMailSettings());
         fieldset.field("Send e-mail", mailCheckbox);
 
         final CheckBox forceShutdownCheckbox = new CheckBox();
-        forceShutdownCheckbox.setDisable(!hasMailSettings());
+        forceShutdownCheckbox.setDisable(hasNoMailSettings());
         fieldset.field("Force shutdown when mail cannot be sent", forceShutdownCheckbox);
 
         final Button startButton = new Button("Schedule");
@@ -63,9 +64,9 @@ class MainForm {
         fieldset.field(buttonBar);
     }
 
-    private boolean hasMailSettings() {
-        File f = new File("mail.properties");
-        return f.exists() && !f.isDirectory();
+    private boolean hasNoMailSettings() {
+        File f = new File(PROPERTIES_FILE);
+        return !f.exists() || f.isDirectory();
     }
 
     private void start(final Fieldset fieldset, final DateTimePicker shutdownDateTimePicker,

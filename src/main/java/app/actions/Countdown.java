@@ -54,17 +54,13 @@ public class Countdown implements IAction {
 
     private void handleTimePassed() {
         try {
-            // Check if we have to send a notification mail
             if (m_shouldSendEmail) {
                 new Mailer().run();
             }
 
-            // Shutdown this machine...
             new Shutdown().run();
         } catch (Exception e) {
-            // Oops, something went wrong
             LOGGER.log(Level.SEVERE, "Cannot execute task after countdown " + e);
-            displayErrorMessage();
             stop();
         }
     }
@@ -73,17 +69,5 @@ public class Countdown implements IAction {
         final LocalDateTime scheduled = AutoOffUtil.nullChecked(m_scheduled);
         final LocalDateTime now = LocalDateTime.now();
         return now.isEqual(scheduled) || now.isAfter(scheduled);
-    }
-
-    private void displayErrorMessage() {
-        Stage alertStage = new Stage();
-        alertStage.initModality(Modality.WINDOW_MODAL);
-
-        VBox vbox = new VBox(new Text("Unable to shutdown the computer"), new Button("Ooh-noo!"));
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setPadding(new Insets(15));
-
-        alertStage.setScene(new Scene(vbox));
-        alertStage.show();
     }
 }

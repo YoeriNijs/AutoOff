@@ -51,8 +51,8 @@ public class SetupMail {
     }
 
     private static GridPane createForm(final Stage stage) {
-        final Properties properties = getMailProperties(LOGGER);
         final boolean hasMailSettings = hasMailSettings();
+        final Properties properties = hasMailSettings ? getMailProperties(LOGGER) : null;
 
         final Form form = new Form();
         form.setMinWidth(APP_WIDTH - 100);
@@ -139,10 +139,6 @@ public class SetupMail {
     private static boolean hasMailSettings() {
         File f = new File(PROPERTIES_FILE);
         return f.exists() && !f.isDirectory();
-    }
-
-    private Properties getMailProperties() {
-        return getMailProperties(LOGGER);
     }
 
     private static String getValue(final Properties properties, final boolean hasMailSettings, final String value) {

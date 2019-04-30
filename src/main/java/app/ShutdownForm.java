@@ -1,6 +1,7 @@
 package app;
 
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import tornadofx.control.DateTimePicker;
 import tornadofx.control.Fieldset;
@@ -29,31 +30,36 @@ class ShutdownForm {
         final DateTimePicker shutdownDateTimePicker = new DateTimePicker();
         fieldset.field("Date and time", shutdownDateTimePicker);
 
+        final CheckBox sendMailCheckbox = new CheckBox();
+        fieldset.field("Send e-mail", sendMailCheckbox);
+
         Button startButton = new Button("Schedule");
-        startButton.setOnMouseClicked(start -> start(fieldset, shutdownDateTimePicker, startButton));
+        startButton.setOnMouseClicked(start -> start(fieldset, shutdownDateTimePicker, sendMailCheckbox, startButton));
 
         fieldset.field(startButton);
     }
 
-    private void start(final Fieldset fieldset, final DateTimePicker shutdownDateTimePicker, final Button startButton) {
+    private void start(final Fieldset fieldset, final DateTimePicker shutdownDateTimePicker,
+            final CheckBox sendMailCheckbox, final Button startButton) {
         shutdownDateTimePicker.setDisable(true);
+        sendMailCheckbox.setDisable(true);
         startButton.setDisable(true);
 
         if (!initialized) {
-            initializeCounterAndCancel(fieldset, shutdownDateTimePicker, startButton);
+            initializeCounterAndCancel(fieldset, shutdownDateTimePicker, sendMailCheckbox, startButton);
         }
 
-        shutdownTimer = new ShutdownTimer(shutdownDateTimePicker);
+        shutdownTimer = new ShutdownTimer(shutdownDateTimePicker, sendMailCheckbox);
         shutdownTimer.start();
     }
 
     private void initializeCounterAndCancel(final Fieldset fieldset, final DateTimePicker shutdownDateTimePicker,
-                                            final Button startButton) {
+                                            final CheckBox sendMailCheckbox, final Button startButton) {
         Label counter = new Label(formatScheduleLabel(shutdownDateTimePicker));
         fieldset.field("Shutdown computer", counter);
 
         Button cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(cancel -> cancel(shutdownDateTimePicker, startButton));
+        cancelButton.setOnAction(cancel -> cancel(shutdownDateTimePicker, sendMailCheckbox, startButton));
         fieldset.field("Abort", cancelButton);
 
         initialized = true;
@@ -64,8 +70,9 @@ class ShutdownForm {
         return shutdownDateTimePicker.getDateTimeValue().format(formatter);
     }
 
-    private void cancel(DateTimePicker shutdownDateTimePicker, Button startButton) {
+    private void cancel(DateTimePicker shutdownDateTimePicker, final CheckBox sendMailCheckbox, Button startButton) {
         shutdownDateTimePicker.setDisable(false);
+        sendMailCheckbox.setDisable(false);
         startButton.setDisable(false);
         shutdownTimer.stop();
     }

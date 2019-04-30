@@ -1,7 +1,9 @@
 package app;
 
+import javafx.scene.control.CheckBox;
 import tornadofx.control.DateTimePicker;
 
+import javax.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Timer;
@@ -16,9 +18,11 @@ class ShutdownTimer {
     private final Timer timer = new Timer("ShutdownTimer");
 
     private final DateTimePicker dateTimePicker;
+    private final CheckBox sendMailCheckbox;
 
-    ShutdownTimer(final DateTimePicker dateTimePicker) {
+    ShutdownTimer(final DateTimePicker dateTimePicker, final CheckBox sendMailCheckbox) {
         this.dateTimePicker = dateTimePicker;
+        this.sendMailCheckbox = sendMailCheckbox;
         doCountDown();
     }
 
@@ -35,6 +39,7 @@ class ShutdownTimer {
             public void run() {
                 if(isTimePassed()) {
                     stop();
+                    sendMail();
                     shutdown();
                 }
             }
@@ -46,6 +51,10 @@ class ShutdownTimer {
         final LocalDateTime scheduled = this.dateTimePicker.getDateTimeValue();
         final LocalDateTime now = LocalDateTime.now();
         return now.isEqual(scheduled) || now.isAfter(scheduled);
+    }
+
+    private boolean shouldSendNotificationMail() {
+        return this.sendMailCheckbox.isSelected();
     }
 
     private void shutdown() {
@@ -66,6 +75,17 @@ class ShutdownTimer {
             System.exit(0);
         } catch (IOException e) {
             throw new RuntimeException("Cannot shutdown computer: " + e.getCause());
+        }
+    }
+
+    private void sendMail() {
+        if (this.shouldSendNotificationMail()) {
+            LOGGER.log(Level.INFO, "Send email");
+            try {
+                Mailer.mail();
+            } catch (MessagingException e) {
+                throw new RuntimeException("Cannot send mail: " + e);
+            }
         }
     }
 }

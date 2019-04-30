@@ -7,6 +7,7 @@ import tornadofx.control.DateTimePicker;
 import tornadofx.control.Fieldset;
 import tornadofx.control.Form;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 class ShutdownForm {
@@ -28,6 +29,7 @@ class ShutdownForm {
         Fieldset fieldset = form.fieldset("Schedule automatic computer shutdown");
 
         final DateTimePicker shutdownDateTimePicker = new DateTimePicker();
+        shutdownDateTimePicker.setDateTimeValue(LocalDateTime.now()); // Initial value
         fieldset.field("Date and time", shutdownDateTimePicker);
 
         final CheckBox sendMailCheckbox = new CheckBox();

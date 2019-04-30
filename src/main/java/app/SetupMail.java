@@ -1,5 +1,6 @@
 package app;
 
+import app.actions.Countdown;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -15,9 +16,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class SetupMail {
-
+    private static final Logger LOGGER = Logger.getLogger(Countdown.class.getName());
     private static final int SCENE_WIDTH = 600;
 
     static void display() {
@@ -105,7 +108,7 @@ class SetupMail {
             OutputStream out = new FileOutputStream(f);
             props.store(out, "AutoOff mail settings");
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Cannot store mail properties: " + e);
         }
     }
 }

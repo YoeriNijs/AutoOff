@@ -1,14 +1,6 @@
 package app.actions;
 
 import app.util.AutoOffUtil;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 import java.time.LocalDateTime;
 import java.util.Timer;

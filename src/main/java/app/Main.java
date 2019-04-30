@@ -12,7 +12,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         stage.setTitle(APP_TITLE);
-        stage.setScene(new Scene(createGridPane(), 300, 275));
+        stage.setScene(new Scene(createGridPane(), 600, 500));
         stage.show();
     }
 
@@ -20,7 +20,7 @@ public class Main extends Application {
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
         gridPane.setVgap(10);
-        gridPane.add(new ShutdownForm().getForm(), 1, 1);
+        gridPane.add(new MainForm().getForm(), 1, 1);
         return gridPane;
     }
 

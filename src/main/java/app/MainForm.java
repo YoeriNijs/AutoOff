@@ -29,7 +29,7 @@ class MainForm {
     }
 
     private void build() {
-        Fieldset fieldset = m_form.fieldset("Schedule automatic computer m_countdown");
+        Fieldset fieldset = m_form.fieldset("Schedule automatic computer shutdown");
 
         final DateTimePicker shutdownDateTimePicker = new DateTimePicker();
         shutdownDateTimePicker.setDateTimeValue(LocalDateTime.now().plusMinutes(1)); // Initial value

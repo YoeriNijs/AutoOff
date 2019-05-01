@@ -1,11 +1,6 @@
 package app.actions;
 
-import app.util.AutoOffUtil;
-
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

@@ -31,16 +31,9 @@ class Mailer implements IAction {
     private Message m_message;
 
     @Override
-    public boolean run() {
+    public void run() throws Exception {
         LOGGER.log(Level.INFO, "Send mail...");
-        try {
-            final Message message = setupMessage();
-            Transport.send(message);
-
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        Transport.send(setupMessage());
     }
 
     private Message setupMessage() throws Exception {

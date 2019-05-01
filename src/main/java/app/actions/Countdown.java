@@ -2,6 +2,7 @@ package app.actions;
 
 import app.util.AutoOffUtil;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,11 +26,10 @@ public class Countdown implements IAction {
     }
 
     @Override
-    public boolean run() {
+    public void run() {
         LOGGER.log(Level.INFO, "Start countdown...");
         final TimerTask task = m_task = createTask();
         timer.schedule(task, 1000L, 60000L);
-        return true;
     }
 
     public void stop() {
@@ -47,19 +47,24 @@ public class Countdown implements IAction {
     }
 
     private void handleTimePassed() {
+        boolean shouldPowerOff = true;
         try {
             if (m_shouldSendEmail) {
-                final boolean sent = new Mailer().run();
-                if (!sent && !m_forceShutdown) {
-                    LOGGER.log(Level.SEVERE, "Cannot send mail");
-                    return;
-                }
+                new Mailer().run();
             }
-
-            new Shutdown().run();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Cannot execute task after countdown " + e);
-            stop();
+            LOGGER.log(Level.SEVERE, "Cannot send email" + e);
+            LOGGER.log(Level.INFO, "Should force shutdown: " + (m_forceShutdown ? "yes" : "no"));
+            shouldPowerOff = m_forceShutdown;
+        }
+
+        if (shouldPowerOff) {
+            try {
+                new Shutdown().run();
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Unable to power off the machine" + e);
+                stop();
+            }
         }
     }
 

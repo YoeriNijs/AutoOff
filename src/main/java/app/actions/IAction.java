@@ -1,5 +1,5 @@
 package app.actions;
 
 public interface IAction {
-    boolean run();
+    void run() throws Exception;
 }

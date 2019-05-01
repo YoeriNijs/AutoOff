@@ -1,9 +1,11 @@
 package app;
 
 import app.actions.Countdown;
+import app.util.AutoOffUtil;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -16,6 +18,8 @@ import java.io.*;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static app.Main.APP_HEIGHT;
 import static app.Main.APP_WIDTH;
@@ -29,6 +33,7 @@ public class SetupMail {
     private static final String PROPERTY_TRUSTED_HOST = "mail.smtp.ssl.trust";
     private static final String PROPERTY_PORT = "mail.smtp.port";
     private static final String PROPERTY_SSL_ENABLED = "mail.smtp.ssl.enable";
+    private static final String PROPERTY_AUTH_ENABLED = "mail.smtp.auth";
     static final String PROPERTIES_FILE = "mail.properties";
     private static final Logger LOGGER = Logger.getLogger(Countdown.class.getName());
 
@@ -67,7 +72,10 @@ public class SetupMail {
         final TextField smtpHostMailAddress = new TextField(getValue(properties, hasMailSettings, PROPERTY_HOST_ADDRESS));
         fieldset.field("Smtp host mail address", smtpHostMailAddress);
 
-        final TextField smtpHostMailPassword = new TextField(getValue(properties, hasMailSettings, PROPERTY_HOST_PASSWORD));
+        final PasswordField smtpHostMailPassword = new PasswordField();
+        final int currentPasswordLength = getValue(properties, hasMailSettings, PROPERTY_SENDER).length();
+        final String passwordFiller = IntStream.range(0, currentPasswordLength).mapToObj(i -> "*").collect(Collectors.joining(""));
+        smtpHostMailPassword.setPromptText(passwordFiller);
         fieldset.field("Smtp host mail password", smtpHostMailPassword);
 
         final TextField host = new TextField(getValue(properties, hasMailSettings, PROPERTY_HOST));
@@ -128,6 +136,11 @@ public class SetupMail {
             props.setProperty(PROPERTY_TRUSTED_HOST, "" + trustedHost);
             props.setProperty(PROPERTY_PORT, "" + port);
             props.setProperty(PROPERTY_SSL_ENABLED, "" + sslEnabled);
+
+            final boolean hasAuthEnabled = !AutoOffUtil.isEmpty(smtpHostMailAddress)
+                    && !AutoOffUtil.isEmpty(smtpHostMailPassword.toString());
+            props.setProperty(PROPERTY_AUTH_ENABLED, String.valueOf(hasAuthEnabled));
+
             File f = new File(PROPERTIES_FILE);
             OutputStream out = new FileOutputStream(f);
             props.store(out, "AutoOff mail settings");

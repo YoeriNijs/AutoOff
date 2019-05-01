@@ -7,8 +7,8 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    public static final int APP_WIDTH = 800;
-    public static final int APP_HEIGHT = 600;
+    static final int APP_WIDTH = 800;
+    static final int APP_HEIGHT = 600;
     private static final String APP_TITLE = "AutoOff";
 
     @Override

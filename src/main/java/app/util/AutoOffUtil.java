@@ -5,4 +5,8 @@ public class AutoOffUtil {
         if(o == null) throw new IllegalStateException("Expecting that object is not null!");
         return o;
     }
+
+    public static boolean isEmpty(String val) {
+        return val == null || val.length() <= 0;
+    }
 }

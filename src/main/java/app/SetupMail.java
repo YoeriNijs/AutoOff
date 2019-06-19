@@ -130,12 +130,12 @@ public class SetupMail {
             Properties props = new Properties();
             props.setProperty(PROPERTY_RECIPIENT, recipient);
             props.setProperty(PROPERTY_SENDER, sender);
-            props.setProperty(PROPERTY_HOST_ADDRESS, "" + smtpHostMailAddress);
-            props.setProperty(PROPERTY_HOST_PASSWORD, "" + smtpHostMailPassword);
-            props.setProperty(PROPERTY_HOST, "" + host);
-            props.setProperty(PROPERTY_TRUSTED_HOST, "" + trustedHost);
-            props.setProperty(PROPERTY_PORT, "" + port);
-            props.setProperty(PROPERTY_SSL_ENABLED, "" + sslEnabled);
+            props.setProperty(PROPERTY_HOST_ADDRESS, smtpHostMailAddress);
+            props.setProperty(PROPERTY_HOST_PASSWORD, smtpHostMailPassword);
+            props.setProperty(PROPERTY_HOST, host);
+            props.setProperty(PROPERTY_TRUSTED_HOST, trustedHost);
+            props.setProperty(PROPERTY_PORT, port);
+            props.setProperty(PROPERTY_SSL_ENABLED, sslEnabled);
 
             final boolean hasAuthEnabled = !AutoOffUtil.isEmpty(smtpHostMailAddress)
                     && !AutoOffUtil.isEmpty(smtpHostMailPassword.toString());
